@@ -173,13 +173,22 @@ SECTIONS
         KEEP(*(.fast_ram))
     } > DLM
 
-    __fast_ram_init_load_addr__ = etext + SIZEOF(.data) + SIZEOF(.fast) + SIZEOF(.tdata) + SIZEOF(.noncacheable.init);
+    __fast_ram_init_load_addr__ = __noncacheable_init_load_addr__ + SIZEOF(.noncacheable.init);
         .fast_ram.init : AT(__fast_ram_init_load_addr__) {
         . = ALIGN(8);
         __fast_ram_init_start__ = .;
         KEEP(*(.fast_ram.init))
         KEEP(*(.fast_ram.init.*))
         __fast_ram_init_end__ = .;
+        . = ALIGN(8);
+    } > DLM
+
+    .fast_ram.bss (NOLOAD) : {
+        . = ALIGN(8);
+        __fast_ram_bss_start__ = .;
+        *(.fast_ram.bss)
+        *(.fast_ram.bss.*)
+        __fast_ram_bss_end__ = .;
         . = ALIGN(8);
     } > DLM
 
@@ -276,7 +285,8 @@ SECTIONS
     } > AXI_SRAM
     __fast_load_addr__ = etext + SIZEOF(.data) + SIZEOF(.tdata);
 
-    __fw_size__ = SIZEOF(.start) + SIZEOF(.vectors) + SIZEOF(.rel) + SIZEOF(.text) + SIZEOF(.data) + SIZEOF(.fast) + SIZEOF(.tdata) + SIZEOF(.noncacheable.init) + SIZEOF(.fast_ram.init) + SIZEOF(.eh_frame) + SIZEOF(.eh_frame_hdr);
+    /* Calculate firmware size based on actual addresses to avoid SIZEOF() issues with LLVM lld */
+    __fw_size__ = (__noncacheable_init_load_addr__ + SIZEOF(.noncacheable.init) + SIZEOF(.fast_ram.init)) - __app_load_addr__;
 
     .heap(NOLOAD) : {
         . = ALIGN(8);
@@ -301,7 +311,7 @@ SECTIONS
         PROVIDE( __rt_rvstack = . );
     } > AXI_SRAM
 
-    __noncacheable_init_load_addr__ = etext + SIZEOF(.data) + SIZEOF(.fast) + SIZEOF(.tdata) + SIZEOF(.fast);
+    __noncacheable_init_load_addr__ = __fast_load_addr__ + SIZEOF(.fast);
     .noncacheable.init : AT(__noncacheable_init_load_addr__) {
         . = ALIGN(8);
         __noncacheable_start__ = .;

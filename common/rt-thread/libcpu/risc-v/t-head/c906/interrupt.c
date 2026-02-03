@@ -11,11 +11,11 @@
 #include <rthw.h>
 #include <rtthread.h>
 
-#include "rt_interrupt.h"
+#include "interrupt.h"
 #include "riscv.h"
 #include "plic.h"
 
-extern rt_uint32_t rt_interrupt_nest;
+extern rt_atomic_t rt_interrupt_nest;
 extern rt_uint32_t rt_interrupt_from_thread, rt_interrupt_to_thread;
 extern rt_uint32_t rt_thread_switch_interrupt_flag;
 
