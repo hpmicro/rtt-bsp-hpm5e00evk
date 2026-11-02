@@ -88,11 +88,11 @@ void app_init_usb_pins(void)
 
 MSH_CMD_EXPORT_ALIAS(rt_hw_cpu_reset, reset, reset the board);
 
-uint32_t rtt_board_init_adc16_clock(void *ptr, bool clk_src_ahb)  /* motor system should be use clk_adc_src_ahb0 */
+uint32_t rtt_board_init_adc16_clock(ADC16_Type *ptr, bool clk_src_ahb)  /* motor system should be use clk_adc_src_ahb0 */
 {
     uint32_t freq = 0;
 
-    if (ptr == (void *)HPM_ADC0) {
+    if (ptr == HPM_ADC0) {
         if (clk_src_ahb) {
             /* Configure the ADC clock from AHB (@200MHz by default)*/
             clock_set_adc_source(clock_adc0, clk_adc_src_ahb0);
@@ -103,7 +103,7 @@ uint32_t rtt_board_init_adc16_clock(void *ptr, bool clk_src_ahb)  /* motor syste
         }
         clock_add_to_group(clock_adc0, 0);
         freq = clock_get_frequency(clock_adc0);
-    } else if (ptr == (void *)HPM_ADC1) {
+    } else if (ptr == HPM_ADC1) {
         if (clk_src_ahb) {
             /* Configure the ADC clock from AHB (@200MHz by default)*/
             clock_set_adc_source(clock_adc1, clk_adc_src_ahb0);
